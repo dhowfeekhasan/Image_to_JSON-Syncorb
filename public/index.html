@@ -96,6 +96,11 @@
     </div>
 
     <script>
+        // Base URL for API requests (use Render URL for production)
+        const API_BASE_URL = window.location.hostname === 'localhost' 
+            ? 'http://localhost:8000' 
+            : 'https://image-to-json-ekonomi.onrender.com';
+
         // Upload Form Submission
         document.getElementById('uploadForm').addEventListener('submit', async (e) => {
             e.preventDefault();
@@ -113,7 +118,7 @@
             resultDiv.textContent = 'Uploading and processing...';
 
             try {
-                const response = await fetch('http://localhost:8000/upload', {
+                const response = await fetch(`${API_BASE_URL}/upload`, {
                     method: 'POST',
                     body: formData
                 });
@@ -135,7 +140,7 @@
             resultDiv.textContent = 'Fetching data...';
 
             try {
-                const response = await fetch(`http://localhost:8000/fetch?userId=${userId}&documentType=${documentType}`);
+                const response = await fetch(`${API_BASE_URL}/fetch?userId=${userId}&documentType=${documentType}`);
                 const data = await response.json();
                 resultDiv.textContent = JSON.stringify(data, null, 2);
             } catch (error) {
