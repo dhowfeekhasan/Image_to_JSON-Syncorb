@@ -1,0 +1,147 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Document Processor</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            max-width: 800px;
+            margin: 20px auto;
+            padding: 20px;
+        }
+        h1 {
+            text-align: center;
+            color: #333;
+        }
+        .section {
+            margin-bottom: 20px;
+            padding: 15px;
+            border: 1px solid #ddd;
+            border-radius: 5px;
+        }
+        label {
+            display: block;
+            margin-bottom: 5px;
+            font-weight: bold;
+        }
+        input, select, button {
+            margin-bottom: 10px;
+            padding: 8px;
+            width: 100%;
+            max-width: 300px;
+        }
+        button {
+            background-color: #007bff;
+            color: white;
+            border: none;
+            cursor: pointer;
+        }
+        button:hover {
+            background-color: #0056b3;
+        }
+        #result, #fetchResult {
+            white-space: pre-wrap;
+            background-color: #f8f9fa;
+            padding: 10px;
+            border-radius: 5px;
+            display: none;
+        }
+    </style>
+</head>
+<body>
+    <h1>Document Processor</h1>
+
+    <!-- Upload Section -->
+    <div class="section">
+        <h2>Upload Document</h2>
+        <form id="uploadForm">
+            <label for="userId">User ID:</label>
+            <input type="text" id="userId" name="userId" required>
+            
+            <label for="documentType">Document Type:</label>
+            <select id="documentType" name="documentType" required>
+                <option value="invoice">Invoice</option>
+                <option value="emi">EMI</option>
+                <option value="hotel bills">Hotel Bills</option>
+            </select>
+            
+            <label for="image">Image File:</label>
+            <input type="file" id="image" name="image" accept="image/*" required>
+            
+            <button type="submit">Upload</button>
+        </form>
+        <div id="result"></div>
+    </div>
+
+    <!-- Fetch Section -->
+    <div class="section">
+        <h2>Fetch Data</h2>
+        <form id="fetchForm">
+            <label for="fetchUserId">User ID:</label>
+            <input type="text" id="fetchUserId" name="fetchUserId" required>
+            
+            <label for="fetchDocumentType">Document Type:</label>
+            <select id="fetchDocumentType" name="fetchDocumentType" required>
+                <option value="all">All</option>
+                <option value="invoice">Invoice</option>
+                <option value="emi">EMI</option>
+                <option value="hotel bills">Hotel Bills</option>
+            </select>
+            
+            <button type="submit">Fetch</button>
+        </form>
+        <div id="fetchResult"></div>
+    </div>
+
+    <script>
+        // Upload Form Submission
+        document.getElementById('uploadForm').addEventListener('submit', async (e) => {
+            e.preventDefault();
+            const userId = document.getElementById('userId').value;
+            const documentType = document.getElementById('documentType').value;
+            const image = document.getElementById('image').files[0];
+            const resultDiv = document.getElementById('result');
+
+            const formData = new FormData();
+            formData.append('userId', userId);
+            formData.append('documentType', documentType);
+            formData.append('image', image);
+
+            resultDiv.style.display = 'block';
+            resultDiv.textContent = 'Uploading and processing...';
+
+            try {
+                const response = await fetch('http://localhost:8000/upload', {
+                    method: 'POST',
+                    body: formData
+                });
+                const data = await response.json();
+                resultDiv.textContent = JSON.stringify(data, null, 2);
+            } catch (error) {
+                resultDiv.textContent = `Error: ${error.message}`;
+            }
+        });
+
+        // Fetch Form Submission
+        document.getElementById('fetchForm').addEventListener('submit', async (e) => {
+            e.preventDefault();
+            const userId = document.getElementById('fetchUserId').value;
+            const documentType = document.getElementById('fetchDocumentType').value;
+            const resultDiv = document.getElementById('fetchResult');
+
+            resultDiv.style.display = 'block';
+            resultDiv.textContent = 'Fetching data...';
+
+            try {
+                const response = await fetch(`http://localhost:8000/fetch?userId=${userId}&documentType=${documentType}`);
+                const data = await response.json();
+                resultDiv.textContent = JSON.stringify(data, null, 2);
+            } catch (error) {
+                resultDiv.textContent = `Error: ${error.message}`;
+            }
+        });
+    </script>
+</body>
+</html>
