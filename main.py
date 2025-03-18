@@ -57,17 +57,22 @@ async def upload_image(
 @app.get("/fetch")
 async def fetch_data(userId: str, documentType: str):
     try:
+        # Ensure the script is called with the correct path
+        fetch_command = [sys.executable, "main.py", "fetch", userId, documentType]
         fetch_output = subprocess.check_output(
-            ["python", "main.py", "fetch", userId, documentType],
+            fetch_command,
             text=True,
-            stderr=subprocess.STDOUT
+            stderr=subprocess.STDOUT,
+            env=os.environ.copy()  # Pass current environment variables
         )
         return {"message": "Fetch successful", "data": fetch_output}
     except subprocess.CalledProcessError as e:
         raise HTTPException(status_code=500, detail=f"Fetch failed: {e.output}")
+    except Exception as e:
+        raise HTTPException(status_code=500, detail=f"Fetch failed: {str(e)}")
 
 if __name__ == "__main__":
     import uvicorn
-    # Use the PORT environment variable from Render, default to 8000 for local testing
-    port = int(os.getenv("PORT", 8001))
+    import sys
+    port = int(os.getenv("PORT", 8000))
     uvicorn.run(app, host="0.0.0.0", port=port)
