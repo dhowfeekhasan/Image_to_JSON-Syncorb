@@ -1,47 +1,71 @@
 import os
-import sys
+from fastapi import FastAPI, UploadFile, Form, HTTPException
+from fastapi.staticfiles import StaticFiles
+from dotenv import load_dotenv
 import subprocess
-from mongodb_process import store_json_in_mongo, fetch_data_for_user
+from pathlib import Path
 
-def transform_json(txt_file_path, user_id, document_type):
-    output_folder = "output"
-    os.makedirs(output_folder, exist_ok=True)
+# Load environment variables
+load_dotenv()
 
-    from JSON_Transformation import extract_invoice_json
-    extract_invoice_json(txt_file_path, os.getenv("TOGETHER_API_KEY"), output_folder)
+app = FastAPI()
 
-    json_file_path = os.path.join(output_folder, os.path.basename(txt_file_path).replace('.txt', '.json'))
-    store_json_in_mongo(json_file_path, user_id, document_type)
+# Serve static files (index.html)
+app.mount("/static", StaticFiles(directory="public"), name="static")
 
-def main():
-    if len(sys.argv) > 1:
-        if sys.argv[1] == "transform_json":
-            transform_json(sys.argv[2], sys.argv[3], sys.argv[4])
-        elif sys.argv[1] == "fetch":
-            user_id = sys.argv[2]
-            document_type = sys.argv[3]
-            result = fetch_data_for_user(user_id, document_type)
-            print(result)
-        else:
-            print("Invalid command. Use 'transform_json' or 'fetch'.")
-    else:
-        # Interactive mode
-        user_id = input("Enter your user ID: ")
-        action = input("Do you want to 'upload' or 'fetch'? ").strip().lower()
-        if action == "upload":
-            image_path = input("Enter the image file path: ")
-            document_type = input("Enter the document type (e.g., invoice, emi, hotel bills): ")
-            if not os.path.exists(image_path):
-                print(f"Error: File not found - {image_path}")
-                return
-            result = subprocess.run(["node", "index.js", image_path, user_id, document_type], text=True, capture_output=True)
-            print(result.stdout)
-        elif action == "fetch":
-            document_type = input("Enter document type (or 'all' for all types): ")
-            result = fetch_data_for_user(user_id, document_type)
-            print(result)
-        else:
-            print("Invalid option! Choose 'upload' or 'fetch'.")
+# Ensure uploads and output folders exist
+UPLOAD_DIR = Path("uploads")
+UPLOAD_DIR.mkdir(exist_ok=True)
+OUTPUT_DIR = Path("output")
+OUTPUT_DIR.mkdir(exist_ok=True)
+
+@app.get("/")
+async def root():
+    return {"message": "Welcome to the Document Processor API"}
+
+@app.post("/upload")
+async def upload_image(
+    userId: str = Form(...),
+    documentType: str = Form(...),
+    image: UploadFile = Form(...)
+):
+    if not os.getenv("TOGETHER_API_KEY"):
+        raise HTTPException(status_code=500, detail="TOGETHER_API_KEY not set in .env file")
+
+    # Save uploaded image
+    image_path = UPLOAD_DIR / image.filename
+    with image_path.open("wb") as buffer:
+        buffer.write(await image.read())
+
+    # Perform OCR via Node.js script
+    try:
+        print("Performing OCR via Node.js script...")
+        result = subprocess.check_output(
+            ["node", "index.js", str(image_path), userId, documentType],
+            text=True,
+            stderr=subprocess.STDOUT
+        )
+        print("OCR and JSON transformation done!")
+    except subprocess.CalledProcessError as e:
+        image_path.unlink()  # Clean up
+        raise HTTPException(status_code=500, detail=f"OCR or transformation failed: {e.output}")
+    finally:
+        image_path.unlink()  # Clean up uploaded file
+
+    return {"message": "Upload successful", "output": result}
+
+@app.get("/fetch")
+async def fetch_data(userId: str, documentType: str):
+    try:
+        fetch_output = subprocess.check_output(
+            ["python", "main.py", "fetch", userId, documentType],
+            text=True,
+            stderr=subprocess.STDOUT
+        )
+        return {"message": "Fetch successful", "data": fetch_output}
+    except subprocess.CalledProcessError as e:
+        raise HTTPException(status_code=500, detail=f"Fetch failed: {e.output}")
 
 if __name__ == "__main__":
-    main()
+    import uvicorn
+    uvicorn.run(app, host="0.0.0.0", port=8000)
