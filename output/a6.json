@@ -1,0 +1,36 @@
+{
+    "invoice": {
+        "header": {
+            "companyName": "Pokeatery CV",
+            "address": "18911 Lake Chabot Road, Castro Valley, CA 94546",
+            "receiptNumber": "3zCW",
+            "authorization": "060071",
+            "paymentMethod": "CHASE VISA",
+            "aid": "A0 00 00 03 10 10"
+        },
+        "body": {
+            "items": [
+                {
+                    "name": "Poke Box",
+                    "options": "Regular, Avocado ($1.00)",
+                    "price": 13.5
+                }
+            ],
+            "subtotal": 13.5,
+            "tax": 1.25,
+            "tip": 1.48,
+            "total": 16.23,
+            "payment": {
+                "method": "Visa",
+                "cardType": "Chip",
+                "cardNumber": "0642",
+                "amount": 16.23
+            }
+        },
+        "footer": {
+            "date": "December 29, 2018",
+            "time": "2:01 PM",
+            "server": "Ramelle"
+        }
+    }
+}

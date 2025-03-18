@@ -1,0 +1,42 @@
+{
+    "invoice": {
+        "billingInfo": {
+            "name": "",
+            "address": "Palladium, Indira Gandhi Nagar, Velachery, Chennai 600042",
+            "gstin": "33AAOFC0310N1ZP",
+            "phone": "6379888177"
+        },
+        "invoiceDetails": {
+            "date": "24/11/19 17:30",
+            "dineIn": 1,
+            "cashier": "iyappan",
+            "billNo": 211,
+            "tokenNo": 25
+        },
+        "items": [
+            {
+                "name": "Black Pepper (Take Away)",
+                "qty": 1,
+                "price": 133.33,
+                "amount": 133.33
+            }
+        ],
+        "taxes": [
+            {
+                "type": "CGST",
+                "rate": 2.5,
+                "amount": 3.33
+            },
+            {
+                "type": "SGST",
+                "rate": 2.5,
+                "amount": 3.33
+            }
+        ],
+        "totals": {
+            "subTotal": 133.33,
+            "roundOff": 0.01,
+            "grandTotal": 140.0
+        }
+    }
+}

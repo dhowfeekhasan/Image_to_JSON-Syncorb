@@ -1,0 +1,22 @@
+The provided image is a receipt from Pokeatery CV, featuring the following details:
+
+**Header**
+Pokeatery CV
+18911 Lake Chabot Road
+Castro Valley, CA 94546
+Receipt: 3zCW
+Authorization: 060071
+CHASE VISA
+AID A0 00 00 03 10 10
+
+**Body**
+Poke Box
+Regular, Avocado ($1.00) | $13.50
+Subtotal | $13.50
+Castro Valley Sales Tax | $1.25
+Tip | $1.48
+Total | $16.23
+Visa 0642 (Chip) | $16.23
+
+**Footer**
+December 29, 2018 2:01 PM Ramelle

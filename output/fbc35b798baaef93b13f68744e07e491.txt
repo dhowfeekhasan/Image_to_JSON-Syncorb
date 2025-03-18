@@ -1,0 +1,36 @@
+Heres a possible format of the provided image in a Markdown format:
+
+# PUT KADALAI
+
+- **Address**: Palladium, Indira Gandhi Nagar, Velachery, Chennai 600042
+  
+- **Contact Information**:
+  - GSTIN: 33AAOFC0310N1ZP
+  - Phone No.: 6379888177
+
+## Receipt Information
+
+### Customer Data
+- **Name**: (Blank)
+
+### Billing Details
+- Date: 24/11/19 17:30
+- Dine-in Details:
+  - Dine in: 1
+  - Cashier: iyappan
+  - Bill No.: 211
+- Tokens: 25
+
+### Items Purchased
+- Item | Quantity | Price | Amount
+  - Black Pepper(Take Away) | 1 | 133.33 | 133.33
+
+### Grand Total
+- Total Quantity: 1
+- Subtotal: 133.33
+  - CGST: 2.5% (3.33)
+  - SGST: 2.5% (3.33)
+
+### Final Bill
+- Round off: +0.01
+- Net Amount (Grand Total): 140.00

@@ -1,0 +1,33 @@
+{
+    "invoice": {
+        "vendor": {
+            "name": "PUT KADALAI",
+            "address": "Palladium, Indira Gandhi Nagar, Velachery, Chennai 600042",
+            "gstIN": "33AAOFC0310N1ZP",
+            "phone": "6379888177"
+        },
+        "invoiceDetails": {
+            "date": "24/11/19",
+            "time": "17:30",
+            "dineIn": 1,
+            "cashier": "iyappan",
+            "billNo": 211,
+            "tokenNo": 25
+        },
+        "items": [
+            {
+                "name": "Black Pepper (Take Away)",
+                "quantity": 1,
+                "price": 133.33,
+                "amount": 133.33
+            }
+        ],
+        "totals": {
+            "subTotal": 133.33,
+            "cgst": 3.33,
+            "sgst": 3.33,
+            "roundOff": 0.01,
+            "grandTotal": 140.0
+        }
+    }
+}

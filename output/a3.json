@@ -1,0 +1,27 @@
+{
+    "invoice_number": "211",
+    "token_number": "25",
+    "date": "24/11/19",
+    "time": "17:30",
+    "cashier": "iyappan",
+    "dine_in": 1,
+    "gst_in": "33AAOFC0310N1ZP",
+    "phone": "6379888177",
+    "address": {
+        "line1": "Palladium, Indira Gandhi Nagar",
+        "line2": "Velachery, Chennai 600042"
+    },
+    "items": [
+        {
+            "name": "Black Pepper (Take Away)",
+            "quantity": 1,
+            "price": 133.33,
+            "amount": 133.33
+        }
+    ],
+    "sub_total": 133.33,
+    "cgst": 2.5,
+    "sgst": 2.5,
+    "round_off": 0.01,
+    "grand_total": 140.0
+}
