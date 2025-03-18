@@ -68,4 +68,6 @@ async def fetch_data(userId: str, documentType: str):
 
 if __name__ == "__main__":
     import uvicorn
-    uvicorn.run(app, host="0.0.0.0", port=8001)
+    # Use the PORT environment variable from Render, default to 8000 for local testing
+    port = int(os.getenv("PORT", 8001))
+    uvicorn.run(app, host="0.0.0.0", port=port)
