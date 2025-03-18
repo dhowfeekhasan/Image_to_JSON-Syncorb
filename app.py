@@ -83,4 +83,4 @@ async def fetch_data(userId: str, documentType: str):
 
 if __name__ == "__main__":
     import uvicorn
-    uvicorn.run(app, host="0.0.0.0", port=8000)  # Confirm this line
+    uvicorn.run(app, host="0.0.0.0", port=8001)  # Confirm this line
