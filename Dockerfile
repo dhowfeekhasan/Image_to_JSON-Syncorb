@@ -10,5 +10,5 @@ WORKDIR /app
 COPY . .
 RUN apt-get install -y tesseract-ocr libtesseract-dev
 RUN pip install -r requirements.txt
-RUN npm install
+RUN npm install --verbose  # Add --verbose for detailed logging
 CMD ["uvicorn", "main:app", "--host", "0.0.0.0", "--port", "$PORT"]
