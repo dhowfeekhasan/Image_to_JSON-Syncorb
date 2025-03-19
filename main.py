@@ -38,6 +38,7 @@ async def upload_image(
     image_path = UPLOAD_DIR / image.filename
     with image_path.open("wb") as buffer:
         buffer.write(await image.read())
+        print(f"Image saved to: {image_path}")  # Debug logging
 
     # Perform OCR via Node.js script
     try:
@@ -48,13 +49,18 @@ async def upload_image(
             stderr=subprocess.STDOUT,
             env=os.environ.copy()  # Pass environment variables
         )
+        print("OCR raw result:", result)  # Debug logging
         print("OCR and JSON transformation done!")
     except subprocess.CalledProcessError as e:
         image_path.unlink()  # Clean up
-        raise HTTPException(status_code=500, detail=f"OCR or transformation failed: {e.output}")
+        error_detail = f"OCR or transformation failed: {e.output}"
+        print(error_detail)  # Debug to console
+        raise HTTPException(status_code=500, detail=error_detail)
     except Exception as e:
         image_path.unlink()  # Clean up
-        raise HTTPException(status_code=500, detail=f"Unexpected error: {str(e)}")
+        error_detail = f"Unexpected error: {str(e)}"
+        print(error_detail)  # Debug to console
+        raise HTTPException(status_code=500, detail=error_detail)
     finally:
         image_path.unlink()  # Clean up uploaded file
 
@@ -63,8 +69,10 @@ async def upload_image(
 @app.get("/fetch")
 async def fetch_data(userId: str, documentType: str):
     try:
-        # Directly call the fetch function instead of using subprocess
+        # Directly call the fetch function
         fetch_output = fetch_data_for_user(userId, documentType)
+        if fetch_output is None:
+            return {"message": "Fetch successful", "data": "No data found"}
         return {"message": "Fetch successful", "data": fetch_output}
     except Exception as e:
         raise HTTPException(status_code=500, detail=f"Fetch failed: {str(e)}")
