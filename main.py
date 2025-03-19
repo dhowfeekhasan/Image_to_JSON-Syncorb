@@ -5,7 +5,7 @@ from fastapi.staticfiles import StaticFiles
 from dotenv import load_dotenv
 import subprocess
 from pathlib import Path
-from mongodb_process import fetch_data_for_user  # Import the function directly
+from mongodb_process import fetch_data_for_user
 
 # Load environment variables
 load_dotenv()
@@ -38,7 +38,7 @@ async def upload_image(
     image_path = UPLOAD_DIR / image.filename
     with image_path.open("wb") as buffer:
         buffer.write(await image.read())
-        print(f"Image saved to: {image_path}")  # Debug logging
+        print(f"Image saved to: {image_path}")
 
     # Perform OCR via Node.js script
     try:
@@ -47,29 +47,28 @@ async def upload_image(
             ["node", "index.js", str(image_path), userId, documentType],
             text=True,
             stderr=subprocess.STDOUT,
-            env=os.environ.copy()  # Pass environment variables
+            env=os.environ.copy()
         )
-        print("OCR raw result:", result)  # Debug logging
+        print("OCR raw result:", result)
         print("OCR and JSON transformation done!")
+        return {"message": "Upload successful", "output": result}
     except subprocess.CalledProcessError as e:
-        image_path.unlink()  # Clean up
         error_detail = f"OCR or transformation failed: {e.output}"
-        print(error_detail)  # Debug to console
+        print(error_detail)
         raise HTTPException(status_code=500, detail=error_detail)
     except Exception as e:
-        image_path.unlink()  # Clean up
         error_detail = f"Unexpected error: {str(e)}"
-        print(error_detail)  # Debug to console
+        print(error_detail)
         raise HTTPException(status_code=500, detail=error_detail)
     finally:
-        image_path.unlink()  # Clean up uploaded file
-
-    return {"message": "Upload successful", "output": result}
+        # Only delete if the file exists
+        if image_path.exists():
+            image_path.unlink()
+            print(f"Image deleted: {image_path}")
 
 @app.get("/fetch")
 async def fetch_data(userId: str, documentType: str):
     try:
-        # Directly call the fetch function
         fetch_output = fetch_data_for_user(userId, documentType)
         if fetch_output is None:
             return {"message": "Fetch successful", "data": "No data found"}
