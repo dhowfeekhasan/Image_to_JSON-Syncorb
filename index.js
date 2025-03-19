@@ -5,6 +5,8 @@ import path from 'path';
 import { execSync } from 'child_process';
 import express from 'express';
 import multer from 'multer';
+import dotenv from 'dotenv';
+dotenv.config();
 
 // Load environment variables
 config();
