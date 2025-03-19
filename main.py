@@ -1,9 +1,11 @@
 import os
+import sys
 from fastapi import FastAPI, UploadFile, Form, HTTPException
 from fastapi.staticfiles import StaticFiles
 from dotenv import load_dotenv
 import subprocess
 from pathlib import Path
+from mongodb_process import fetch_data_for_user  # Import the function directly
 
 # Load environment variables
 load_dotenv()
@@ -43,12 +45,16 @@ async def upload_image(
         result = subprocess.check_output(
             ["node", "index.js", str(image_path), userId, documentType],
             text=True,
-            stderr=subprocess.STDOUT
+            stderr=subprocess.STDOUT,
+            env=os.environ.copy()  # Pass environment variables
         )
         print("OCR and JSON transformation done!")
     except subprocess.CalledProcessError as e:
         image_path.unlink()  # Clean up
         raise HTTPException(status_code=500, detail=f"OCR or transformation failed: {e.output}")
+    except Exception as e:
+        image_path.unlink()  # Clean up
+        raise HTTPException(status_code=500, detail=f"Unexpected error: {str(e)}")
     finally:
         image_path.unlink()  # Clean up uploaded file
 
@@ -57,22 +63,13 @@ async def upload_image(
 @app.get("/fetch")
 async def fetch_data(userId: str, documentType: str):
     try:
-        # Ensure the script is called with the correct path
-        fetch_command = [sys.executable, "main.py", "fetch", userId, documentType]
-        fetch_output = subprocess.check_output(
-            fetch_command,
-            text=True,
-            stderr=subprocess.STDOUT,
-            env=os.environ.copy()  # Pass current environment variables
-        )
+        # Directly call the fetch function instead of using subprocess
+        fetch_output = fetch_data_for_user(userId, documentType)
         return {"message": "Fetch successful", "data": fetch_output}
-    except subprocess.CalledProcessError as e:
-        raise HTTPException(status_code=500, detail=f"Fetch failed: {e.output}")
     except Exception as e:
         raise HTTPException(status_code=500, detail=f"Fetch failed: {str(e)}")
 
 if __name__ == "__main__":
     import uvicorn
-    import sys
     port = int(os.getenv("PORT", 8000))
     uvicorn.run(app, host="0.0.0.0", port=port)
