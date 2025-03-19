@@ -4,7 +4,7 @@ from datetime import datetime
 import os
 
 def store_json_in_mongo(file_path, user_id, document_type):
-    client = os.getenv("MONGODB_URI")
+    client = MongoClient(os.getenv("MONGODB_URI"))
     db = client['customer_data']
     collection_name = f"user_{user_id}"
     collection = db[collection_name]
@@ -26,17 +26,22 @@ def store_json_in_mongo(file_path, user_id, document_type):
     print(f"Data stored in MongoDB (Collection: '{collection_name}').")
 
 def fetch_data_for_user(user_id, document_type):
-    client = os.getenv("MONGODB_URI")
-    db = client['customer_data']
-    
-    collection_name = f"user_{user_id}"
-    collection = db[collection_name]
+    try:
+        client = MongoClient(os.getenv("MONGODB_URI"))
+        db = client['customer_data']
+        collection_name = f"user_{user_id}"
+        collection = db[collection_name]
 
-    query = {} if document_type.lower() == 'all' else {'document_type': document_type}
-    data = collection.find(query)
-    
-    data_list = list(data)
-    if data_list:
-        return json.dumps(data_list, indent=4, default=str)
-    else:
-        return f"No data found for User {user_id} and Document Type '{document_type}'"
+        query = {} if document_type.lower() == 'all' else {'document_type': document_type}
+        data = collection.find(query)
+        
+        data_list = list(data)
+        if data_list:
+            return json.dumps(data_list, indent=4, default=str)
+        else:
+            return f"No data found for User {user_id} and Document Type '{document_type}'"
+    except Exception as e:
+        print(f"Fetch error: {str(e)}")
+        return None
+    finally:
+        client.close()  # Ensure the client connection is closed
