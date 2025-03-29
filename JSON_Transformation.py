@@ -1,3 +1,4 @@
+# json_transformation.py
 import os
 import sys
 import json
@@ -5,8 +6,7 @@ from together import Together
 
 def clean_json_output(raw_output: str) -> str:
     """Remove unwanted symbols and delimiters from the API response."""
-    cleaned = raw_output.strip()  # Remove leading/trailing whitespace and newlines
-    # Remove common delimiters
+    cleaned = raw_output.strip()
     delimiters = ["```json", "```", "```javascript"]
     for delimiter in delimiters:
         cleaned = cleaned.replace(delimiter, "")
@@ -46,30 +46,22 @@ def extract_invoice_json(file_path: str, api_key: str, output_folder: str):
     )
 
     raw_output = response.choices[0].message.content
-    # Removed Raw API output print statement
-
-    if not raw_output.strip():
-        print("\nError: No content received from the API.")
-        return
-
-    # Clean the output and log it
     cleaned_output = clean_json_output(raw_output)
-    print(f"{cleaned_output}")
 
     output_filepath = os.path.join(output_folder, os.path.basename(file_path).replace('.txt', '.json'))
     try:
         json_data = json.loads(cleaned_output)
         with open(output_filepath, "w", encoding="utf-8") as json_file:
             json.dump(json_data, json_file, indent=4)
-        print(f"\nJSON output saved to {output_filepath}")
+        print(f"JSON output saved to {output_filepath}")
     except json.JSONDecodeError as e:
-        print(f"\nError: Invalid JSON received - {e}")
-        print(f"{cleaned_output}")
+        print(f"Error: Invalid JSON received - {e}")
+        print(f"Raw output: {cleaned_output}")
         return
 
 if __name__ == "__main__":
     if len(sys.argv) < 3:
-        print("Usage: python JSON_Transformation.py <path_to_txt_file> <output_folder_path>")
+        print("Usage: python json_transformation.py <path_to_txt_file> <output_folder_path>")
         sys.exit(1)
 
     file_path = sys.argv[1]
